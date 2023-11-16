@@ -8,7 +8,7 @@ on:
 
 jobs:
   # build:
-  #   runs-on: ubuntu-latest
+     runs-on: linux-ica2,linux-ica2
 
   #   steps:
   #   - name: Checkout Repository
