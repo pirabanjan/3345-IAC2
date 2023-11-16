@@ -5,6 +5,11 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
+     name: Debug SSH Key
+  run: |
+    echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
+    cat private_key.pem
+  shell: bash
 
 jobs:
   build:
