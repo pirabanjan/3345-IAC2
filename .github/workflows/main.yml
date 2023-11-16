@@ -7,14 +7,14 @@ on:
     branches: ["main"]
 
 jobs:
-  build:
+  build_and_test_linux:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-ica2]
+        os: [linux-ica2]
     # runs-on: linux-ica2
     
-    name: Build and Test
+    name: Build and Test in linux
 
     steps:
       - name: Checkout Repository
@@ -23,7 +23,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.11
         env:
           VERBOSE: 1
 
@@ -46,30 +46,24 @@ jobs:
           name: test-results
           path: test-reports
           
-  cleanup:
-    runs-on: windows-latest
-    steps:
-      - name: Remove Python toolcache
-        run: |
-          $pythonPath = 'D:\Lambton\3rd-Semester\CI-CD\ICA2-Runner\actions-runner\_work\_tool\Python'
-          if (Test-Path $pythonPath) {
-            Remove-Item -Path $pythonPath -Recurse -Force -ErrorAction SilentlyContinue
-          }
+  build_and_test_win:
+      runs-on: ${{ matrix.os }}
+      strategy:
+        matrix:
+          os: [windows-ica2]
+      # runs-on: linux-ica2
+      
+      name: Build and Test in win
+  
+      steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11' 
+      - run: python my_script.py
 
-      - name: Remove Python registry entries
-        run: |
-          # Add commands to remove registry entries if needed
-
-      - name: Remove remaining artifacts
-        run: |
-          $tempPath = 'D:\Lambton\3rd-Semester\CI-CD\ICA2-Runner\actions-runner\_work\_temp'
-          if (Test-Path $tempPath) {
-            Remove-Item -Path $tempPath -Recurse -Force -ErrorAction SilentlyContinue
-          }
-
-            
   push_to_registry:
-    needs: build
+    needs: build_and_test_linux
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
