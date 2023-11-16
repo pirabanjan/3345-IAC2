@@ -66,3 +66,27 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          
+  deploy_to_ec2:
+    needs: push_to_registry
+    runs-on: ubuntu-latest
+    name: Deploy to EC2 instance
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Copy SSH key to runner
+        run: |
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: SSH into EC2 instance
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            docker pull pirabanjan/buy-it-customer-service:latest
+            docker run -d -p 80:80 pirabanjan/buy-it-customer-service:latest
