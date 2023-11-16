@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: [self hosted,linux-ica2,windows-ica2]
+    runs-on: [linux-ica2,windows-ica2]
     name: Build and Test
 
     steps:
@@ -40,7 +40,7 @@ jobs:
 
   push_to_registry:
     needs: build
-    runs-on: [self hosted,linux-ica2,windows-ica2]
+    runs-on: [linux-ica2,windows-ica2]
     name: Push Docker image to Docker Hub
 
     steps:
@@ -69,7 +69,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           
   deploy_to_ec2:
-    runs-on: [self hosted,linux-ica2,windows-ica2]
+    runs-on: [linux-ica2,windows-ica2]
     name: Deploy to EC2 instance
   
     steps:
