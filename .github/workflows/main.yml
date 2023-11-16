@@ -98,5 +98,3 @@ jobs:
           script: |
             docker pull pirabanjan/ica2:main
             docker run -d -p 80:5000 pirabanjan/ica2
-
-            
