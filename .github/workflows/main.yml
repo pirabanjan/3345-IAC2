@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [linux-ica2]
+        os: [windows_ica2-2]
     # runs-on: linux-ica2
     
     name: Build and Test in linux
@@ -50,7 +50,7 @@ jobs:
       runs-on: ${{ matrix.os }}
       strategy:
         matrix:
-          os: [windows-ica2]
+          os: [windows_ica2-2]
       # runs-on: linux-ica2
       
       name: Build and Test in win
