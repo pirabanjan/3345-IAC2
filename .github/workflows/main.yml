@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: [self-hosted,linux-ica2,Windows]
+    runs-on: [linux-ica2,Windows]
     name: Build and Test
 
     steps:
