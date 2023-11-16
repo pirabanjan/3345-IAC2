@@ -95,6 +95,3 @@ jobs:
           script: |
             docker pull pirabanjan/buy-it-customer-service:main
             docker run -d -p 80:80 pirabanjan/buy-it-customer-service:main
-
-
-
