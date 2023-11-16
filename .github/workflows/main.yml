@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [linux-ica2, Windows]
+        os: [linux-ica2, windows-ica2]
     # runs-on: linux-ica2
     
     name: Build and Test
@@ -48,7 +48,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [linux-ica2, Windows]
+        os: [linux-ica2, windows-ica2]
     name: Push Docker image to Docker Hub
 
     steps:
@@ -81,7 +81,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [linux-ica2, Windows]
+        os: [linux-ica2, windows-ica2]
     name: Deploy to EC2 instance
   
     steps:
