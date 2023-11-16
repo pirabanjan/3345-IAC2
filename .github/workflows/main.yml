@@ -75,17 +75,6 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-  
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "Printing SSH key:"
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          cat ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -t rsa ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-          cat ~/.ssh/known_hosts
-        shell: bash
 
   
       - name: SSH into EC2 instance
@@ -93,7 +82,7 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
-          key: ~/.ssh/id_rsa
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
             docker pull pirabanjan/buy-it-customer-service:main
             docker run -d -p 80:80 pirabanjan/buy-it-customer-service:main
