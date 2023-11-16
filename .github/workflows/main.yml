@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: [linux-ica2,Windows]
+    runs-on: linux-ica2
     name: Build and Test
 
     steps:
