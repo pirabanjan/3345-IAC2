@@ -67,28 +67,32 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           
-  deploy_to_ec2:
-    needs: push_to_registry
-    runs-on: ubuntu-latest
-    name: Deploy to EC2 instance
-  
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
-  
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-  
-      - name: SSH into EC2 instance
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ~/.ssh/id_rsa  # Update the key path as needed
-          script: |
-            docker pull pirabanjan/buy-it-customer-service:main
-            docker run -d -p 80:80 pirabanjan/buy-it-customer-service:main
+deploy_to_ec2:
+  needs: push_to_registry
+  runs-on: ubuntu-latest
+  name: Deploy to EC2 instance
+
+  steps:
+    - name: Check out the repo
+      uses: actions/checkout@v2
+
+    - name: Debug SSH Key
+      run: |
+        echo "Private Key: ${EC2_SSH_PRIVATE_KEY}"
+        mkdir -p ~/.ssh
+        echo "${EC2_SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        cat ~/.ssh/id_rsa  # Print the key for further verification
+      shell: bash
+
+    - name: SSH into EC2 instance
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ~/.ssh/id_rsa  # Update the key path as needed
+        script: |
+          docker pull pirabanjan/buy-it-customer-service:main
+          docker run -d -p 80:80 pirabanjan/buy-it-customer-service:main
+
 
