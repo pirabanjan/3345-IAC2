@@ -45,7 +45,23 @@ jobs:
         with:
           name: test-results
           path: test-reports
-
+          
+  cleanup:
+      runs-on: windows-latest
+      needs: build
+      steps:
+        - name: Remove Python toolcache
+          run: |
+            Remove-Item -Path 'D:\Lambton\3rd-Semester\CI-CD\ICA2-Runner\actions-runner\_work\_tool\Python' -Recurse -Force -ErrorAction SilentlyContinue
+  
+        - name: Remove Python registry entries
+          run: |
+            # Add commands to remove registry entries if needed
+  
+        - name: Remove remaining artifacts
+          run: |
+            Remove-Item -Path 'D:\Lambton\3rd-Semester\CI-CD\ICA2-Runner\actions-runner\_work\_temp' -Recurse -Force -ErrorAction SilentlyContinue
+            
   push_to_registry:
     needs: build
     runs-on: ${{ matrix.os }}
