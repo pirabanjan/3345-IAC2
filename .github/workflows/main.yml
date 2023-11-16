@@ -96,7 +96,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
-            docker pull pirabanjan/buy-it-customer-service:main
+            docker pull pirabanjan/ica2:main
             docker run -d -p 80:5000 pirabanjan/ica2
 
             
