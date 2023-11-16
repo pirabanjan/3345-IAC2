@@ -47,20 +47,26 @@ jobs:
           path: test-reports
           
   cleanup:
-      runs-on: windows-latest
-      needs: build
-      steps:
-        - name: Remove Python toolcache
-          run: |
-            Remove-Item -Path 'D:\Lambton\3rd-Semester\CI-CD\ICA2-Runner\actions-runner\_work\_tool\Python' -Recurse -Force -ErrorAction SilentlyContinue
-  
-        - name: Remove Python registry entries
-          run: |
-            # Add commands to remove registry entries if needed
-  
-        - name: Remove remaining artifacts
-          run: |
-            Remove-Item -Path 'D:\Lambton\3rd-Semester\CI-CD\ICA2-Runner\actions-runner\_work\_temp' -Recurse -Force -ErrorAction SilentlyContinue
+    runs-on: windows-latest
+    steps:
+      - name: Remove Python toolcache
+        run: |
+          $pythonPath = 'D:\Lambton\3rd-Semester\CI-CD\ICA2-Runner\actions-runner\_work\_tool\Python'
+          if (Test-Path $pythonPath) {
+            Remove-Item -Path $pythonPath -Recurse -Force -ErrorAction SilentlyContinue
+          }
+
+      - name: Remove Python registry entries
+        run: |
+          # Add commands to remove registry entries if needed
+
+      - name: Remove remaining artifacts
+        run: |
+          $tempPath = 'D:\Lambton\3rd-Semester\CI-CD\ICA2-Runner\actions-runner\_work\_temp'
+          if (Test-Path $tempPath) {
+            Remove-Item -Path $tempPath -Recurse -Force -ErrorAction SilentlyContinue
+          }
+
             
   push_to_registry:
     needs: build
