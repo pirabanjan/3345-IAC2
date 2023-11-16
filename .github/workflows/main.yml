@@ -38,6 +38,7 @@ jobs:
         path: test-reports
 
   push_to_registry:
+    needs: build
     runs-on: ubuntu-latest
     name: Push Docker image to Docker Hub
 
