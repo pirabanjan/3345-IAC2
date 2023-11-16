@@ -45,7 +45,10 @@ jobs:
 
   push_to_registry:
     needs: build
-    runs-on: [self-hosted,linux-ica2,Windows]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [linux-ica2, Windows]
     name: Push Docker image to Docker Hub
 
     steps:
@@ -74,7 +77,11 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           
   deploy_to_ec2:
-    runs-on: [self-hosted,linux-ica2,Windows]
+    needs: push_to_registry
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [linux-ica2, Windows]
     name: Deploy to EC2 instance
   
     steps:
