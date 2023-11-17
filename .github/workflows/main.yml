@@ -39,6 +39,11 @@ jobs:
           mkdir -p test-reports
           pytest test_app.py --junitxml=test-reports/test_results.xml
 
+      # - name: Upload Test Results
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: test-results-${{ matrix.os }}
+      #     path: test-reports
       - name: Upload Test Results
         uses: actions/upload-artifact@v2
         with:
@@ -175,19 +180,20 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: test-results-windows
-          path: downloaded-artifacts/test-results/windows  # Specify the path to store the downloaded artifacts for Windows
-  
+          path: downloaded-artifacts/test-results/windows
+      
       - name: Download build_and_test artifacts (Linux)
         uses: actions/download-artifact@v2
         with:
           name: test-results-linux
-          path: downloaded-artifacts/test-results/linux  # Specify the path to store the downloaded artifacts for Linux
-  
+          path: downloaded-artifacts/test-results/linux
+      
       - name: Download deploy_and_test artifacts
         uses: actions/download-artifact@v2
         with:
           name: test_results_con
-          path: downloaded-artifacts/test_results_con  # Specify the path to store the downloaded artifacts
+          path: downloaded-artifacts/test_results_con
+
 
 
 
