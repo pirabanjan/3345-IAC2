@@ -116,7 +116,7 @@ jobs:
           docker rm pirabanjan-container        
     
   deploy_to_ec2:
-    # needs: deploy_and_test
+    needs: deploy_and_test
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
