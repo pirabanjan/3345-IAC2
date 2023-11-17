@@ -7,84 +7,84 @@ on:
     branches: ["main"]
 
 jobs:
-  # build_and_test:
-  #   runs-on: ${{ matrix.os }}
-  #   strategy:
-  #     matrix:
-  #       os: [windows_ica2-2,linux-ica2]
-  #   # runs-on: linux-ica2
+  build_and_test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows_ica2-2,linux-ica2]
+    # runs-on: linux-ica2
     
-  #   name: Build and Test
+    name: Build and Test
 
-  #   steps:
-  #     - name: Checkout Repository
-  #       uses: actions/checkout@v2
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v2
-  #       with:
-  #         python-version: 3.11
-  #       env:
-  #         VERBOSE: 1
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+        env:
+          VERBOSE: 1
 
-  #     - name: Install dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install Flask matplotlib numpy  # Add this line to install additional dependencies
-  #         pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install Flask matplotlib numpy  # Add this line to install additional dependencies
+          pip install -r requirements.txt
 
-  #     - name: Run Tests
-  #       id: test
-  #       run: |
-  #         mkdir -p test-reports
-  #         pytest test_app.py --junitxml=test-reports/test_results.xml
+      - name: Run Tests
+        id: test
+        run: |
+          mkdir -p test-reports
+          pytest test_app.py --junitxml=test-reports/test_results.xml
 
-  #     - name: Upload Test Results
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: test-results
-  #         path: test-reports
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: test-reports
 
-  # push_to_registry:
-  #   needs: build_and_test
-  #   runs-on: ${{ matrix.os }}
-  #   strategy:
-  #     matrix:
-  #       os: [linux-ica2]
-  #   name: Push Docker image to Docker Hub
+  push_to_registry:
+    needs: build_and_test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [linux-ica2]
+    name: Push Docker image to Docker Hub
 
-  #   steps:
-  #     - name: Check out the repo
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
         
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v1
-  #       with:
-  #         version: latest
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
 
-  #     - name: Log in to Docker Hub
-  #       uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-  #       with:
-  #         username: ${{ secrets.CI_REGISTRY_USER }}
-  #         password: ${{ secrets.CI_REGISTRY_PASSWORD }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ secrets.CI_REGISTRY_USER }}
+          password: ${{ secrets.CI_REGISTRY_PASSWORD }}
 
-  #     - name: Extract metadata (tags, labels) for Docker
-  #       id: meta
-  #       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-  #       with:
-  #         images: pirabanjan/ica2
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: pirabanjan/ica2
 
-  #     - name: Build and push Docker image
-  #       uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-  #       with:
-  #         context: .
-  #         file: ./Dockerfile
-  #         push: true
-  #         tags: ${{ steps.meta.outputs.tags }}
-  #         labels: ${{ steps.meta.outputs.labels }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           
   deploy_and_test:
-    # needs: push_to_registry
+    needs: push_to_registry
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -149,4 +149,22 @@ jobs:
             # Pull the new container and run it
             docker pull pirabanjan/ica2:main
             docker run -d -p 80:5000 --name pirabanjan-container pirabanjan/ica2:main
+            
+  download_artifacts:
+    needs: [build_and_test, deploy_and_test]  # Specify the jobs that produce the artifacts
+    runs-on: ubuntu-latest
+  
+    steps:
+      - name: Download build_and_test artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: test-results
+          path: downloaded-artifacts/test-results  # Specify the path to store the downloaded artifacts
+  
+      - name: Download deploy_and_test artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: test_results_con
+          path: downloaded-artifacts/test_results_con  # Specify the path to store the downloaded artifacts
+
 
