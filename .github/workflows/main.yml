@@ -42,7 +42,7 @@ jobs:
       - name: Upload Test Results
         uses: actions/upload-artifact@v2
         with:
-          name: test-results
+          name: test-results-${{ matrix.os }}
           path: test-reports
 
   push_to_registry:
@@ -150,21 +150,45 @@ jobs:
             docker pull pirabanjan/ica2:main
             docker run -d -p 80:5000 --name pirabanjan-container pirabanjan/ica2:main
             
+  # download_artifacts:
+  #   needs: [build_and_test, deploy_and_test]  # Specify the jobs that produce the artifacts
+  #   runs-on: ubuntu-latest
+  
+  #   steps:
+  #     - name: Download build_and_test artifacts
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: test-results
+  #         path: downloaded-artifacts/test-results  # Specify the path to store the downloaded artifacts
+  
+  #     - name: Download deploy_and_test artifacts
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: test_results_con
+  #         path: downloaded-artifacts/test_results_con  # Specify the path to store the downloaded artifacts
   download_artifacts:
     needs: [build_and_test, deploy_and_test]  # Specify the jobs that produce the artifacts
     runs-on: ubuntu-latest
   
     steps:
-      - name: Download build_and_test artifacts
+      - name: Download build_and_test artifacts (Windows)
         uses: actions/download-artifact@v2
         with:
-          name: test-results
-          path: downloaded-artifacts/test-results  # Specify the path to store the downloaded artifacts
+          name: test-results-windows
+          path: downloaded-artifacts/test-results/windows  # Specify the path to store the downloaded artifacts for Windows
+  
+      - name: Download build_and_test artifacts (Linux)
+        uses: actions/download-artifact@v2
+        with:
+          name: test-results-linux
+          path: downloaded-artifacts/test-results/linux  # Specify the path to store the downloaded artifacts for Linux
   
       - name: Download deploy_and_test artifacts
         uses: actions/download-artifact@v2
         with:
           name: test_results_con
           path: downloaded-artifacts/test_results_con  # Specify the path to store the downloaded artifacts
+
+
 
 
