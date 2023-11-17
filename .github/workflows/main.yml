@@ -83,39 +83,57 @@ jobs:
   #         tags: ${{ steps.meta.outputs.tags }}
   #         labels: ${{ steps.meta.outputs.labels }}
           
+  # deploy_to_ec2:
+  #   # needs: push_to_registry
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [linux-ica2]
+  #   name: Deploy to EC2 instance
+  
+  #   # steps:
+  #   #   - name: Check out the repo
+  #   #     uses: actions/checkout@v2
+
+  
+  #   #   - name: Deploy to EC2 instance
+  #   #     uses: appleboy/ssh-action@master
+  #   #     with:
+  #   #       host: ${{ secrets.EC2_HOST }}
+  #   #       username: ${{ secrets.EC2_USERNAME }}
+  #   #       key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+  #   #       script: |
+  #   #         docker pull pirabanjan/ica2:main
+  #   #         docker run -d -p 80:5000 pirabanjan/ica2
+  #   steps:
+  #     - uses: actions/checkout@v2 
+  #     - name: Build & Deploy
+  #       env:
+  #           PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+  #           HOSTNAME: ${{secrets.EC2_HOST}}
+  #           USER_NAME: ${{secrets.EC2_USERNAME}}
+  #       run: |
+  #         echo "$PRIVATE_KEY" > private_key
+  #         chmod 600 private_key
+  #         ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+  #         docker pull pirabanjan/ica2:main
+  #         docker run -d -p 80:5000 pirabanjan/ica2          
   deploy_to_ec2:
-    # needs: push_to_registry
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [linux-ica2]
     name: Deploy to EC2 instance
-  
-    # steps:
-    #   - name: Check out the repo
-    #     uses: actions/checkout@v2
-
-  
-    #   - name: Deploy to EC2 instance
-    #     uses: appleboy/ssh-action@master
-    #     with:
-    #       host: ${{ secrets.EC2_HOST }}
-    #       username: ${{ secrets.EC2_USERNAME }}
-    #       key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-    #       script: |
-    #         docker pull pirabanjan/ica2:main
-    #         docker run -d -p 80:5000 pirabanjan/ica2
     steps:
       - uses: actions/checkout@v2 
       - name: Build & Deploy
         env:
-            PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-            HOSTNAME: ${{secrets.EC2_HOST}}
-            USER_NAME: ${{secrets.EC2_USERNAME}}
+          PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          HOSTNAME: ${{ secrets.EC2_HOST }}
+          USER_NAME: ${{ secrets.EC2_USERNAME }}
         run: |
           echo "$PRIVATE_KEY" > private_key
           chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
-          docker pull pirabanjan/ica2:main
-          docker run -d -p 80:5000 pirabanjan/ica2          
-          
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} \
+            'docker pull pirabanjan/ica2:main && docker run -d -p 80:5000 pirabanjan/ica2'
+
