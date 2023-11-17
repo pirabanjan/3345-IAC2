@@ -82,7 +82,36 @@ jobs:
   #         push: true
   #         tags: ${{ steps.meta.outputs.tags }}
   #         labels: ${{ steps.meta.outputs.labels }}
-          
+  deploy_and_test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [linux-ica2]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: actions/setup-docker@v2
+
+      - name: Pull Docker image
+        run: docker pull pirabanjan/ica2:main
+
+      - name: Run Docker container and execute tests
+        run: |
+          docker run --name pirabanjan-container pirabanjan/ica2:main sh -c "your_test_command > test_output.txt"
+          docker cp pirabanjan-container:/app/test_output.txt .
+
+      - name: Save test output as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-output
+          path: test_output.txt
+
+      - name: Remove the Docker container
+        run: |
+          docker rm pirabanjan-container        
   # deploy_to_ec2:
   #   # needs: push_to_registry
   #   runs-on: ${{ matrix.os }}
@@ -118,32 +147,32 @@ jobs:
   #         ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
   #         docker pull pirabanjan/ica2:main
   #         docker run -d -p 80:5000 pirabanjan/ica2          
- deploy_to_ec2:
-  # needs: push_to_registry
-  runs-on: ${{ matrix.os }}
-  strategy:
-    matrix:
-      os: [windows-ica2]
-  name: Deploy to EC2 instance
-
-  steps:
-    - name: Check out the repo
-      uses: actions/checkout@v2
-
-    - name: Deploy to EC2 instance
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-        script: |
-          # Stop and remove the existing container if it exists
-          if docker ps -a | grep pirabanjan/ica2; then
-            docker stop pirabanjan-container
-            docker rm pirabanjan-container
-          fi
-
-          # Pull the new container and run it
-          docker pull pirabanjan/ica2:main
-          docker run -d -p 80:5000 --name pirabanjan-container pirabanjan/ica2:main
+  deploy_to_ec2:
+    # needs: push_to_registry
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [linux-ica2]
+    name: Deploy to EC2 instance
+  
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+  
+      - name: Deploy to EC2 instance
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            # Stop and remove the existing container if it exists
+            if docker ps -a | grep pirabanjan/ica2; then
+              docker stop pirabanjan-container
+              docker rm pirabanjan-container
+            fi
+  
+            # Pull the new container and run it
+            docker pull pirabanjan/ica2:main
+            docker run -d -p 80:5000 --name pirabanjan-container pirabanjan/ica2:main
 
