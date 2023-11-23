@@ -149,10 +149,3 @@ jobs:
             # Pull the new container and run it
             docker pull pirabanjan/ica2:main
             docker run -d -p 80:5000 --name pirabanjan-container pirabanjan/ica2:main
-            
-  
-
-
-
-
-
